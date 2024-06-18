@@ -14,12 +14,12 @@ class TransactionController extends Controller
         $user = Auth::user();
         $transactions = Transaction::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
 
-        return view('transactions.index', compact('transactions'));
+        return view('pages.transactions.index', compact('transactions'));
     }
 
     public function create()
     {
-        return view('transactions.create');
+        return view('pages.transactions.create');
     }
 
     public function store(Request $request)
@@ -53,7 +53,7 @@ class TransactionController extends Controller
 
             \DB::commit();
 
-            return redirect()->route('transactions.index')->with('success', 'Transacción realizada con éxito');
+            return redirect()->route('pages.transactions.index')->with('success', 'Transacción realizada con éxito');
         } catch (\Exception $e) {
             \DB::rollBack();
 
