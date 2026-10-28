@@ -41,7 +41,9 @@ This directory contains the formal architectural blueprints, legacy audit, regul
   * Comprehensive failure recovery criteria for monetary clearing timeouts and ambiguous states.
   * 8-Phase execution roadmap (Phase 0 through Phase 7) with dependencies and acceptance criteria.
 
-* **[05. Formal Registry of Pending Reviews](./PENDING-REVIEWS.md)**
+* **[05. Ledger Core Formal Architecture, Data Model & Invariants](./architecture/05-ledger-core-formal-design.md)**
+  * Complete entity-relationship model, boundary justification, mandatory mathematical invariants, lifecycle state machines, deterministic row-locking proof against double-spending, and proposed PostgreSQL 18 DDL blueprint.
+* **[06. Formal Registry of Pending Reviews](./PENDING-REVIEWS.md)**
   * Explicit tracking of accounting invariants verification, concurrency benchmarking, regulatory operating model choice, external financial integrations, and commercial trademark validation.
 
 ---
@@ -58,6 +60,7 @@ This directory contains the formal architectural blueprints, legacy audit, regul
 ### 3. Architecture Decision Records (ADR)
 * **[ADR-0001: Adoption of Modular Monorepo Topology and Node.js 24 / TypeScript Baseline](./decisions/ADR-0001-modular-monorepo-and-technology-baseline.md)**
 * **[ADR-0002: Enforcement of Immutable Double-Entry Ledger, Exact Monetary Representation, and Deadlock Handling](./decisions/ADR-0002-immutable-double-entry-ledger.md)**
+* **[ADR-0003: Ledger Core Schema Design, Mathematical Invariants, and Transactional Consistency](./decisions/ADR-0003-ledger-core-schema-and-transactional-consistency.md)**
 
 
 ---
