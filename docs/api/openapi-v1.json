@@ -1,0 +1,113 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SaintPatrickBK Core Financial Gateway API",
+    "version": "1.0.0",
+    "description": "Official REST API for SaintPatrickBK Payment Service Provider (PSPCP). Operates under BCRA and UIF regulatory frameworks in the Argentine Republic.",
+    "contact": {
+      "name": "SaintPatrickBK Engineering & Compliance",
+      "email": "security@saintpatrickbk.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Production / Development Ingress Gateway"
+    }
+  ],
+  "paths": {
+    "/accounts": {
+      "get": {
+        "summary": "List Accounts for Authenticated Subject",
+        "operationId": "listAccounts",
+        "tags": ["Accounts"],
+        "responses": {
+          "200": { "description": "List of payment accounts retrieved successfully." },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/accounts/{id}": {
+      "get": {
+        "summary": "Get Account Details by ID",
+        "operationId": "getAccountById",
+        "tags": ["Accounts"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Account details retrieved successfully." },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden - Account belongs to another customer" },
+          "404": { "description": "Not Found" }
+        }
+      }
+    },
+    "/accounts/{id}/balance": {
+      "get": {
+        "summary": "Get Real-Time Account Balance",
+        "operationId": "getAccountBalance",
+        "tags": ["Accounts", "Balances"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Account balance retrieved successfully." },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" }
+        }
+      }
+    },
+    "/accounts/{id}/transactions": {
+      "get": {
+        "summary": "Get Historical Account Transactions",
+        "operationId": "getAccountTransactions",
+        "tags": ["Accounts", "Transactions"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": {
+          "200": { "description": "Transaction history retrieved successfully." },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" }
+        }
+      }
+    },
+    "/transfers/internal": {
+      "post": {
+        "summary": "Initiate Internal P2P Transfer (Test Environment / Guarded)",
+        "operationId": "initiateInternalTransfer",
+        "tags": ["Transfers"],
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Transfer confirmed and posted to double-entry ledger." },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden - Unverified KYC or unauthorized source account" },
+          "404": { "description": "Not Found - Account or recipient not found" },
+          "409": { "description": "Conflict - Idempotency conflict" },
+          "422": { "description": "Unprocessable Entity - Insufficient funds or inactive account" }
+        }
+      }
+    },
+    "/transfers/{id}": {
+      "get": {
+        "summary": "Get Transfer Details",
+        "operationId": "getTransferById",
+        "tags": ["Transfers"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Transfer details retrieved." }
+        }
+      }
+    }
+  }
+}

@@ -18,9 +18,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@spbk/shared-kernel": "workspace:*"
+    "@spbk/ledger": "workspace:*",
+    "@spbk/shared-kernel": "workspace:*",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "^10.18.0",
+    "@types/pg": "^8.11.11",
+    "testcontainers": "^10.18.0",
     "typescript": "^5.8.2",
     "vitest": "^3.0.7"
   }

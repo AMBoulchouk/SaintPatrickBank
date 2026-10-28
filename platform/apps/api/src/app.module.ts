@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller.js';
+import { AccountsModule } from './accounts/accounts.module.js';
 import { createDatabasePool, DatabasePool } from '@spbk/infrastructure';
 
 @Module({
+  imports: [AccountsModule],
   controllers: [HealthController],
   providers: [
     {
@@ -13,3 +15,4 @@ import { createDatabasePool, DatabasePool } from '@spbk/infrastructure';
   exports: ['DATABASE_POOL'],
 })
 export class AppModule {}
+

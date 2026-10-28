@@ -51,7 +51,7 @@ describe('Ledger Invariants, Zero-Sum, and Locking Guards (PostgreSQL 18)', () =
   afterAll(async () => {
     if (adminPool) await adminPool.end();
     if (container) await container.stop();
-  }, 30000);
+  }, 60000);
 
   it('should physically reject an empty journal entry (0 lines) at COMMIT time', async () => {
     const client = await adminPool.connect();
@@ -196,4 +196,59 @@ describe('Ledger Invariants, Zero-Sum, and Locking Guards (PostgreSQL 18)', () =
       adminPool.query(`DELETE FROM ledger.journal_lines WHERE journal_entry_id = '${validEntryId}'`)
     ).rejects.toThrow(/INV-05 VIOLATION: Journal lines are strictly immutable/i);
   });
+
+  it('should prove that the internal is_locked transition cannot be abused to modify other fields', async () => {
+    const probeEntryId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+    const client = await adminPool.connect();
+
+    // 1. Insert an entry with is_locked = FALSE (deferred trigger will verify on COMMIT)
+    await client.query('BEGIN;');
+    await client.query(`
+      INSERT INTO ledger.journal_entries (id, financial_operation_id, idempotency_key, entry_type, description, is_locked)
+      VALUES ('${probeEntryId}', '${testOpId}', 'probe_transition_key', 'PROBE', 'Original description', FALSE);
+    `);
+    await client.query(`
+      INSERT INTO ledger.journal_lines (journal_entry_id, account_id, entry_number, direction, amount_cents, currency)
+      VALUES 
+        ('${probeEntryId}', '${accountArsA}', 1, 'DEBIT', 2000, 'ARS'),
+        ('${probeEntryId}', '${accountArsB}', 2, 'CREDIT', 2000, 'ARS');
+    `);
+
+    // 2. Attempt malicious UPDATE inside transaction: set is_locked = TRUE while altering description
+    await client.query('SAVEPOINT sp_desc;');
+    await expect(
+      client.query(`
+        UPDATE ledger.journal_entries 
+        SET is_locked = TRUE, description = 'Tampered description via lock bypass' 
+        WHERE id = '${probeEntryId}'
+      `)
+    ).rejects.toThrow(/INV-05 VIOLATION: Journal entries are immutable/i);
+    await client.query('ROLLBACK TO SAVEPOINT sp_desc;');
+
+    // 3. Attempt malicious UPDATE inside transaction: set is_locked = TRUE while altering idempotency_key
+    await client.query('SAVEPOINT sp_key;');
+    await expect(
+      client.query(`
+        UPDATE ledger.journal_entries 
+        SET is_locked = TRUE, idempotency_key = 'hacked_key' 
+        WHERE id = '${probeEntryId}'
+      `)
+    ).rejects.toThrow(/INV-05 VIOLATION: Journal entries are immutable/i);
+    await client.query('ROLLBACK TO SAVEPOINT sp_key;');
+
+    // 4. Commit legitimately (deferred trigger sets is_locked = TRUE safely without modifying other fields)
+    await client.query('COMMIT;');
+    client.release();
+
+    const verified = await adminPool.query(`SELECT description, idempotency_key, is_locked FROM ledger.journal_entries WHERE id = '${probeEntryId}'`);
+    expect(verified.rows[0].description).toBe('Original description');
+    expect(verified.rows[0].idempotency_key).toBe('probe_transition_key');
+    expect(verified.rows[0].is_locked).toBe(true);
+
+    // 5. Once locked, even setting is_locked = TRUE with identical fields is rejected
+    await expect(
+      adminPool.query(`UPDATE ledger.journal_entries SET is_locked = TRUE WHERE id = '${probeEntryId}'`)
+    ).rejects.toThrow(/INV-05 VIOLATION: Journal entries are immutable/i);
+  });
 });
+

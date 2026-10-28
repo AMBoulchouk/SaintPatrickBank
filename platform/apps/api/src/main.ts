@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module.js';
+import { ProblemDetailsExceptionFilter } from './common/filters/http-exception.filter.js';
 import { StructuredLogger } from '@spbk/infrastructure';
 
 async function bootstrap() {
@@ -16,6 +17,7 @@ async function bootstrap() {
   );
 
   app.enableShutdownHooks();
+  app.useGlobalFilters(new ProblemDetailsExceptionFilter());
 
   await app.listen(port, host);
   logger.info(`SaintPatrickBK API Gateway running on http://${host}:${port}`, {

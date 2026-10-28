@@ -193,9 +193,15 @@ importers:
       '@nestjs/platform-fastify':
         specifier: ^11.0.11
         version: 11.2.8(@nestjs/common@11.2.8(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.8(@nestjs/common@11.2.8(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(reflect-metadata@0.2.2)(rxjs@7.8.2))
+      '@spbk/accounts':
+        specifier: workspace:*
+        version: link:../../packages/accounts
       '@spbk/infrastructure':
         specifier: workspace:*
         version: link:../../packages/infrastructure
+      '@spbk/ledger':
+        specifier: workspace:*
+        version: link:../../packages/ledger
       '@spbk/shared-kernel':
         specifier: workspace:*
         version: link:../../packages/shared-kernel
@@ -233,10 +239,25 @@ importers:
 
   packages/accounts:
     dependencies:
+      '@spbk/ledger':
+        specifier: workspace:*
+        version: link:../ledger
       '@spbk/shared-kernel':
         specifier: workspace:*
         version: link:../shared-kernel
+      pg:
+        specifier: ^8.13.1
+        version: 8.23.1
     devDependencies:
+      '@testcontainers/postgresql':
+        specifier: ^10.18.0
+        version: 10.28.0(supports-color@8.1.1)
+      '@types/pg':
+        specifier: ^8.11.11
+        version: 8.23.1
+      testcontainers:
+        specifier: ^10.18.0
+        version: 10.28.0(supports-color@8.1.1)
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
@@ -1046,6 +1067,9 @@ packages:
     resolution: {integrity: sha512-+Y1Sd49cSDq60UOl8/U2HI0ebUvnSl/hDhMHQn+ouw17yb8fYwMWIazzJ4JFpSkjPE7sj5NTNSX9IoyEqcFfyQ==}
     cpu: [x64]
     os: [win32]
+
+  '@testcontainers/postgresql@10.28.0':
+    resolution: {integrity: sha512-NN25rruG5D4Q7pCNIJuHwB+G85OSeJ3xHZ2fWx0O6sPoPEfCYwvpj8mq99cyn68nxFkFYZeyrZJtSFO+FnydiA==}
 
   '@testcontainers/postgresql@12.2.1':
     resolution: {integrity: sha512-MIbI5KjZ9M4SY4+xzxg/w4ZLBeV+Jd6ognXoWn7dh/mhIhBbn7ss0MiZHNg2XbCbu03BW9YQ9+H9xW8PFkJWaA==}
@@ -3492,6 +3516,15 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.65.1':
     optional: true
+
+  '@testcontainers/postgresql@10.28.0(supports-color@8.1.1)':
+    dependencies:
+      testcontainers: 10.28.0(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - react-native-b4a
+      - supports-color
 
   '@testcontainers/postgresql@12.2.1(supports-color@8.1.1)':
     dependencies:
