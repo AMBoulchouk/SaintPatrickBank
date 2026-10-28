@@ -1,0 +1,69 @@
+/**
+ * SaintPatrickBK Design Tokens - CSS Custom Properties
+ * Brand Identity Preserved from Original Laravel Implementation
+ */
+
+:root {
+  /* Brand Primary Palette (Coral Red) */
+  --spbk-brand-primary: #FF2D20;
+  --spbk-brand-primary-rgb: 255, 45, 32;
+  --spbk-brand-primary-hover: #FF4D40;
+  --spbk-brand-primary-active: #D91E12;
+  --spbk-brand-primary-subtle: rgba(255, 45, 32, 0.10);
+  --spbk-brand-primary-border: rgba(255, 45, 32, 0.30);
+
+  /* Semantic Feedback */
+  --spbk-color-success: #10B981;
+  --spbk-color-warning: #F59E0B;
+  --spbk-color-danger: #EF4444;
+  --spbk-color-info: #3B82F6;
+
+  /* Typography */
+  --spbk-font-sans: 'Inter', 'Figtree', system-ui, -apple-system, sans-serif;
+  --spbk-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Radius */
+  --spbk-radius-sm: 6px;
+  --spbk-radius-md: 10px;
+  --spbk-radius-lg: 16px;
+  --spbk-radius-full: 9999px;
+}
+
+/* Dark Theme (Default Fintech Platform Mode) */
+[data-theme="dark"],
+.dark,
+:root {
+  --spbk-bg-base: #000000;
+  --spbk-bg-surface-1: #09090b; /* zinc-950 */
+  --spbk-bg-surface-2: #18181b; /* zinc-900 */
+  --spbk-bg-surface-3: #27272a; /* zinc-800 */
+  
+  --spbk-text-primary: #FFFFFF;
+  --spbk-text-secondary: #A1A1AA; /* zinc-400 */
+  --spbk-text-muted: #71717A;     /* zinc-500 */
+  
+  --spbk-border-subtle: rgba(255, 255, 255, 0.08);
+  --spbk-border-strong: rgba(255, 255, 255, 0.18);
+  
+  --spbk-shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --spbk-shadow-glow: 0 0 20px rgba(255, 45, 32, 0.25);
+}
+
+/* Light Theme (For specific printable statements or optional toggle) */
+[data-theme="light"],
+.light {
+  --spbk-bg-base: #F9FAFB;        /* gray-50 */
+  --spbk-bg-surface-1: #FFFFFF;
+  --spbk-bg-surface-2: #F3F4F6;   /* gray-100 */
+  --spbk-bg-surface-3: #E5E7EB;   /* gray-200 */
+  
+  --spbk-text-primary: #111827;   /* gray-900 */
+  --spbk-text-secondary: #4B5563; /* gray-600 */
+  --spbk-text-muted: #9CA3AF;     /* gray-400 */
+  
+  --spbk-border-subtle: #E5E7EB;
+  --spbk-border-strong: #D1D5DB;
+  
+  --spbk-shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  --spbk-shadow-glow: 0 0 15px rgba(255, 45, 32, 0.15);
+}

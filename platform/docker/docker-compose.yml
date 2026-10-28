@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: spbk_postgres18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-saintpatrickbk_dev}
+      POSTGRES_USER: ${DB_USER:-spbk_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-spbk_dev_secret}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      # Explicit loopback binding: never expose PostgreSQL publicly
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - spbk_pg18_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-spbk_admin} -d ${DB_NAME:-saintpatrickbk_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  spbk_pg18_data:
+    name: spbk_pg18_data
+    driver: local

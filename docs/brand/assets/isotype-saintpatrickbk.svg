@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="96" height="96" fill="none">
+  <!-- SaintPatrickBK Official Isotype: Modern Geometric Vault Shield -->
+  <defs>
+    <linearGradient id="spbk-red-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E54" />
+      <stop offset="50%" stop-color="#FF2D20" />
+      <stop offset="100%" stop-color="#D91E12" />
+    </linearGradient>
+    <linearGradient id="spbk-dark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b" />
+      <stop offset="100%" stop-color="#09090b" />
+    </linearGradient>
+    <filter id="spbk-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#FF2D20" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Base Shield Badge -->
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#spbk-dark-grad)" stroke="#27272a" stroke-width="1.5" />
+  
+  <!-- Geometric Vault / Monogram "S-P-BK" Node Mark -->
+  <g filter="url(#spbk-glow)">
+    <!-- Top-Left Facet -->
+    <path d="M24 10 L34 16 L34 23 L24 17 Z" fill="url(#spbk-red-grad)" opacity="0.95" />
+    <!-- Top-Right Facet -->
+    <path d="M24 10 L14 16 L14 23 L24 17 Z" fill="#FF7066" opacity="0.85" />
+    <!-- Center Core Node (Security Vault) -->
+    <polygon points="24,19 32,24 24,29 16,24" fill="#FFFFFF" opacity="0.95" />
+    <!-- Bottom-Left Leg -->
+    <path d="M14 26 L24 32 L24 39 L14 33 Z" fill="url(#spbk-red-grad)" />
+    <!-- Bottom-Right Leg -->
+    <path d="M34 26 L24 32 L24 39 L34 33 Z" fill="#D91E12" />
+    <!-- Dynamic Fintech Core Light Indicator -->
+    <circle cx="24" cy="24" r="2.5" fill="#FF2D20" stroke="#FFFFFF" stroke-width="1" />
+  </g>
+</svg>

@@ -1,0 +1,32 @@
+{
+  "name": "@spbk/infrastructure",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SaintPatrickBK Infrastructure: Structured Logging, Database Connection Pools, Telemetry",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@spbk/shared-kernel": "workspace:*",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^12.2.1",
+    "@types/pg": "^8.23.1",
+    "testcontainers": "^12.2.1",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}
