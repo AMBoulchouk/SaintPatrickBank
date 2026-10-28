@@ -23,7 +23,7 @@ export const openApiV1Contract = {
   ],
   security: [
     {
-      TrustedSubjectAuth: [],
+      BearerAuth: [],
     },
   ],
   paths: {
@@ -266,12 +266,12 @@ export const openApiV1Contract = {
   },
   components: {
     securitySchemes: {
-      TrustedSubjectAuth: {
-        type: 'apiKey',
-        in: 'header',
-        name: 'X-User-Id',
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
         description:
-          'Trusted subject authentication injected by API Gateway / mTLS reverse proxy. Accompanied by X-User-Roles and X-Kyc-Status.',
+          'Cryptographically signed JSON Web Token (JWT HS256) issued by @spbk/identity. Contains authenticated subject identity, cryptographic signature, issuer, audience, and expiration.',
       },
     },
     schemas: {
@@ -420,6 +420,7 @@ export const openApiV1Contract = {
       },
       ProblemDetails: {
         type: 'object',
+        description: 'RFC 9457 Problem Details object (standard for HTTP error responses, superseding RFC 7807)',
         required: ['type', 'title', 'status', 'detail', 'code', 'instance', 'correlationId', 'timestamp'],
         properties: {
           type: { type: 'string', format: 'uri' },

@@ -62,6 +62,7 @@ This directory contains the formal architectural blueprints, legacy audit, regul
 * **[ADR-0002: Enforcement of Immutable Double-Entry Ledger, Exact Monetary Representation, and Deadlock Handling](./decisions/ADR-0002-immutable-double-entry-ledger.md)**
 * **[ADR-0003: Ledger Core Schema Design, Mathematical Invariants, and Transactional Consistency](./decisions/ADR-0003-ledger-core-schema-and-transactional-consistency.md)**
 * **[ADR-0004: Accounts ↔ Ledger Integration, Financial Authorization, and REST Contracts](./decisions/ADR-0004-accounts-ledger-integration-and-financial-authorization.md)**
+* **[ADR-0005: Identity & Access Bounded Context, Cryptographic Sessions, and Reinforced Financial Authorization](./decisions/ADR-0005-identity-access-session-security-and-reinforced-financial-authorization.md)**
 * **[OpenAPI 3.1 REST Specification v1](./api/openapi-v1.json)**
 
 

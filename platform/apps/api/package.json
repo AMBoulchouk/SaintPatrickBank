@@ -19,6 +19,7 @@
     "@nestjs/core": "^11.0.11",
     "@nestjs/platform-fastify": "^11.0.11",
     "@spbk/accounts": "workspace:*",
+    "@spbk/identity": "workspace:*",
     "@spbk/infrastructure": "workspace:*",
     "@spbk/ledger": "workspace:*",
     "@spbk/shared-kernel": "workspace:*",

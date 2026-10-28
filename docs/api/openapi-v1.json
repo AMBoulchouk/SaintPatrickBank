@@ -15,6 +15,11 @@
       "description": "Production / Development Ingress Gateway"
     }
   ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
   "paths": {
     "/accounts": {
       "get": {
@@ -23,7 +28,7 @@
         "tags": ["Accounts"],
         "responses": {
           "200": { "description": "List of payment accounts retrieved successfully." },
-          "401": { "description": "Unauthorized" }
+          "401": { "$ref": "#/components/responses/Unauthorized" }
         }
       }
     },
@@ -37,43 +42,43 @@
         ],
         "responses": {
           "200": { "description": "Account details retrieved successfully." },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden - Account belongs to another customer" },
-          "404": { "description": "Not Found" }
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
         }
       }
     },
     "/accounts/{id}/balance": {
       "get": {
-        "summary": "Get Real-Time Account Balance",
+        "summary": "Get Real-Time Financial Balance",
         "operationId": "getAccountBalance",
-        "tags": ["Accounts", "Balances"],
+        "tags": ["Accounts"],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
         ],
         "responses": {
-          "200": { "description": "Account balance retrieved successfully." },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" }
+          "200": { "description": "Account balance snapshot calculated from double-entry ledger." },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
         }
       }
     },
     "/accounts/{id}/transactions": {
       "get": {
-        "summary": "Get Historical Account Transactions",
+        "summary": "Get Paginated Account Journal History",
         "operationId": "getAccountTransactions",
-        "tags": ["Accounts", "Transactions"],
+        "tags": ["Accounts"],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20, "maximum": 100 } },
           { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
         ],
         "responses": {
           "200": { "description": "Transaction history retrieved successfully." },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" }
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
         }
       }
     },
@@ -87,26 +92,66 @@
         ],
         "responses": {
           "200": { "description": "Transfer confirmed and posted to double-entry ledger." },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden - Unverified KYC or unauthorized source account" },
-          "404": { "description": "Not Found - Account or recipient not found" },
-          "409": { "description": "Conflict - Idempotency conflict" },
-          "422": { "description": "Unprocessable Entity - Insufficient funds or inactive account" }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "422": { "$ref": "#/components/responses/UnprocessableEntity" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Cryptographically signed JSON Web Token (JWT HS256) issued by @spbk/identity. Contains authenticated subject identity, cryptographic signature, issuer, audience, and expiration."
+      }
+    },
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "description": "RFC 9457 Problem Details object (standard for HTTP error responses, superseding RFC 7807)",
+        "required": ["type", "title", "status", "detail", "code", "instance", "correlationId", "timestamp"],
+        "properties": {
+          "type": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" },
+          "code": { "type": "string" },
+          "instance": { "type": "string" },
+          "correlationId": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
         }
       }
     },
-    "/transfers/{id}": {
-      "get": {
-        "summary": "Get Transfer Details",
-        "operationId": "getTransferById",
-        "tags": ["Transfers"],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
-        ],
-        "responses": {
-          "200": { "description": "Transfer details retrieved." }
-        }
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request - Validation or parameter format error",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized - Missing or invalid cryptographic Bearer credentials",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
+      },
+      "Forbidden": {
+        "description": "Forbidden - Insufficient permissions or unverified KYC status",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
+      },
+      "NotFound": {
+        "description": "Not Found - Resource does not exist",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
+      },
+      "Conflict": {
+        "description": "Conflict - Idempotency conflict with differing payload parameters",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
+      },
+      "UnprocessableEntity": {
+        "description": "Unprocessable Entity - Financial business rule violation",
+        "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
       }
     }
   }

@@ -8,6 +8,17 @@ import {
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { StructuredLogger } from '@spbk/infrastructure';
 
+/**
+ * RFC 9457 Problem Details Exception Filter
+ * Implements "Problem Details for HTTP APIs" (RFC 9457, June 2023, obsoleting RFC 7807).
+ *
+ * Guarantees:
+ * - Content-Type: application/problem+json
+ * - Standard RFC 9457 members: type, title, status, detail, instance
+ * - Extension members: code, correlationId, timestamp
+ * - Strict information hiding: Infrastructure and SQL errors are sanitized; sensitive internal
+ *   details (stack traces, SQL text, table/column names) are NEVER leaked to HTTP clients.
+ */
 @Catch()
 export class ProblemDetailsExceptionFilter implements ExceptionFilter {
   private readonly logger = new StructuredLogger('ExceptionFilter');

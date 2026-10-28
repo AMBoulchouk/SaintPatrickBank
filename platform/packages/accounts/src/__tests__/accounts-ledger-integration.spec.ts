@@ -169,7 +169,7 @@ describe('Accounts ↔ Ledger Bounded Contexts Integration (PostgreSQL 18)', () 
         id: ALICE_ACCOUNT_ID,
         customerId: CUST_ALICE_ID,
         accountNumber: 'SPBK-0001-ALICE',
-        cvu: new CVU('0000001700000000000111'),
+        cvu: CVU.createForTesting('000', '0001', '1'),
         alias: new AccountAlias('alice.spbk'),
         currency: 'ARS',
         status: 'ACTIVE',
@@ -186,7 +186,7 @@ describe('Accounts ↔ Ledger Bounded Contexts Integration (PostgreSQL 18)', () 
         id: BOB_ACCOUNT_ID,
         customerId: CUST_BOB_ID,
         accountNumber: 'SPBK-0002-BOB',
-        cvu: new CVU('0000001700000000000222'),
+        cvu: CVU.createForTesting('000', '0001', '2'),
         alias: new AccountAlias('bob.spbk'),
         currency: 'ARS',
         status: 'ACTIVE',
@@ -203,7 +203,7 @@ describe('Accounts ↔ Ledger Bounded Contexts Integration (PostgreSQL 18)', () 
         id: CHARLIE_ACCOUNT_ID,
         customerId: CUST_CHARLIE_ID,
         accountNumber: 'SPBK-0003-CHARLIE',
-        cvu: new CVU('0000001700000000000333'),
+        cvu: CVU.createForTesting('000', '0001', '3'),
         alias: new AccountAlias('charlie.spbk'),
         currency: 'ARS',
         status: 'ACTIVE',
@@ -220,7 +220,7 @@ describe('Accounts ↔ Ledger Bounded Contexts Integration (PostgreSQL 18)', () 
         id: SUSPENDED_ACCOUNT_ID,
         customerId: CUST_SUSPENDED_ID,
         accountNumber: 'SPBK-0004-SUSP',
-        cvu: new CVU('0000001700000000000444'),
+        cvu: CVU.createForTesting('000', '0001', '4'),
         alias: new AccountAlias('suspended.spbk'),
         currency: 'ARS',
         status: 'SUSPENDED',
@@ -237,7 +237,7 @@ describe('Accounts ↔ Ledger Bounded Contexts Integration (PostgreSQL 18)', () 
         id: BLOCKED_ACCOUNT_ID,
         customerId: CUST_BLOCKED_ID,
         accountNumber: 'SPBK-0005-BLOCK',
-        cvu: new CVU('0000001700000000000555'),
+        cvu: CVU.createForTesting('000', '0001', '5'),
         alias: new AccountAlias('blocked.spbk'),
         currency: 'ARS',
         status: 'BLOCKED',
@@ -268,7 +268,7 @@ describe('Accounts ↔ Ledger Bounded Contexts Integration (PostgreSQL 18)', () 
 
     expect(account.id).toBe(ALICE_ACCOUNT_ID);
     expect(account.customerId).toBe(CUST_ALICE_ID);
-    expect(account.cvu).toBe('0000001700000000000111');
+    expect(account.cvu).toBe(CVU.createForTesting('000', '0001', '1').value);
     expect(account.alias).toBe('alice.spbk');
     expect(account.status).toBe('ACTIVE');
   });

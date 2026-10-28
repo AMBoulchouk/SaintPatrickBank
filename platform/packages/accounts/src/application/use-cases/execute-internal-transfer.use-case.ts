@@ -1,5 +1,6 @@
 import { PaymentAccountRepository } from '../../domain/ports/payment-account.repository.interface.js';
 import { FinancialTransferPort } from '../../domain/ports/financial-transfer.port.interface.js';
+import { CustomerCompliancePort } from '../../domain/ports/customer-compliance.port.interface.js';
 import {
   InitiateTransferCommand,
   TransferReceiptDto,
@@ -9,6 +10,7 @@ import {
   AccountNotFoundException,
   UnauthorizedAccountAccessException,
   InsufficientKycLevelException,
+  AccountNotActiveException,
   CurrencyMismatchException,
   InvalidTransferAmountException,
 } from '../../domain/exceptions/account.exceptions.js';
@@ -18,15 +20,28 @@ export class ExecuteInternalTransferUseCase {
   constructor(
     private readonly accountRepository: PaymentAccountRepository,
     private readonly financialTransferPort: FinancialTransferPort,
+    private readonly customerCompliancePort?: CustomerCompliancePort | undefined,
   ) {}
 
   async execute(
     command: InitiateTransferCommand,
     auth: AuthContext,
   ): Promise<TransferReceiptDto> {
-    // 1. Mandatory Identity & Compliance Check (SCA / KYC verification)
-    if (auth.kycStatus !== 'VERIFIED') {
-      throw new InsufficientKycLevelException(auth.subjectId, auth.kycStatus);
+    // 1. Mandatory Identity & Compliance Check (Fresh / Live KYC verification)
+    // Never trust stale claims inside JWT tokens for monetary transactions!
+    if (this.customerCompliancePort) {
+      const liveStatus = await this.customerCompliancePort.getLiveCustomerStatus(auth.subjectId);
+      if (!liveStatus || liveStatus.status === 'BLOCKED' || liveStatus.status === 'SUSPENDED') {
+        throw new AccountNotActiveException(command.sourceAccountId, liveStatus?.status ?? 'UNKNOWN');
+      }
+      if (liveStatus.kycStatus !== 'VERIFIED') {
+        throw new InsufficientKycLevelException(auth.subjectId, liveStatus.kycStatus);
+      }
+    } else {
+      // Direct token-based verification
+      if (auth.kycStatus !== 'VERIFIED') {
+        throw new InsufficientKycLevelException(auth.subjectId, auth.kycStatus);
+      }
     }
 
     // 2. Validate Transfer Amount

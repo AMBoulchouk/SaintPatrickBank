@@ -18,9 +18,15 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@spbk/shared-kernel": "workspace:*"
+    "@node-rs/argon2": "^2.2.2",
+    "@spbk/shared-kernel": "workspace:*",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
+    "@spbk/ledger": "workspace:*",
+    "@testcontainers/postgresql": "^12.2.1",
+    "@types/pg": "^8.23.1",
+    "testcontainers": "^12.2.1",
     "typescript": "^5.8.2",
     "vitest": "^3.0.7"
   }

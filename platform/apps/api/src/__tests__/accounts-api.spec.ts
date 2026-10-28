@@ -15,6 +15,7 @@ import {
 } from '@spbk/accounts';
 import { ProblemDetailsExceptionFilter } from '../common/filters/http-exception.filter.js';
 import { FinancialAuthGuard } from '../common/auth/auth.guard.js';
+import { JwtTokenService, AuthenticatedPrincipal } from '@spbk/identity';
 import { ExecutionContext, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -50,16 +51,19 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 1. FinancialAuthGuard Unit Tests
+  // 1. FinancialAuthGuard Unit Tests (Cryptographic Token Verification)
   // ---------------------------------------------------------------------------
   describe('FinancialAuthGuard', () => {
-    const guard = new FinancialAuthGuard();
+    const tokenService = new JwtTokenService({
+      secretKey: 'test_financial_vault_secret_key_minimum_32_chars!',
+    });
+    const guard = new FinancialAuthGuard(tokenService);
 
-    it('should allow access when X-User-Id is provided', () => {
+    it('should reject spoofing attempts via X-User-Id, X-User-Roles, or X-Kyc-Status', async () => {
       const mockRequest = {
         headers: {
           'x-user-id': 'user-123',
-          'x-user-roles': 'ROLE_CUSTOMER',
+          'x-user-roles': 'ROLE_ADMIN',
           'x-kyc-status': 'VERIFIED',
         },
       } as unknown as FastifyRequest;
@@ -70,12 +74,12 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
         }),
       } as unknown as ExecutionContext;
 
-      expect(guard.canActivate(mockContext)).toBe(true);
-      expect(mockRequest.user?.id).toBe('user-123');
-      expect(mockRequest.user?.kycStatus).toBe('VERIFIED');
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        /Identity spoofing rejected/,
+      );
     });
 
-    it('should throw UnauthorizedException when X-User-Id is missing', () => {
+    it('should throw UnauthorizedException when Bearer token is missing', async () => {
       const mockRequest = {
         headers: {},
       } as unknown as FastifyRequest;
@@ -86,7 +90,36 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
         }),
       } as unknown as ExecutionContext;
 
-      expect(() => guard.canActivate(mockContext)).toThrow(UnauthorizedException);
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        /Missing Bearer token/,
+      );
+    });
+
+    it('should allow access and set principal when valid cryptographic Bearer token is provided', async () => {
+      const principal = new AuthenticatedPrincipal({
+        id: 'user-123',
+        email: 'user@saintpatrickbk.com',
+        roles: ['ROLE_CUSTOMER'],
+        kycStatus: 'VERIFIED',
+      });
+      const validToken = await tokenService.createAccessToken(principal);
+
+      const mockRequest = {
+        headers: {
+          authorization: `Bearer ${validToken}`,
+        },
+      } as unknown as FastifyRequest;
+
+      const mockContext = {
+        switchToHttp: () => ({
+          getRequest: () => mockRequest,
+        }),
+      } as unknown as ExecutionContext;
+
+      const result = await guard.canActivate(mockContext);
+      expect(result).toBe(true);
+      expect(mockRequest.user?.id).toBe('user-123');
+      expect(mockRequest.user?.kycStatus).toBe('VERIFIED');
     });
   });
 
@@ -319,7 +352,7 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
       return { mockHost, sentPayload };
     };
 
-    it('should format AccountNotFoundException as RFC 7807 404', () => {
+    it('should format AccountNotFoundException as RFC 9457 404', () => {
       const { mockHost, sentPayload } = createMockHost();
       filter.catch(new AccountNotFoundException('acc-999'), mockHost);
 
@@ -334,7 +367,7 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
       );
     });
 
-    it('should format UnauthorizedAccountAccessException as RFC 7807 403', () => {
+    it('should format UnauthorizedAccountAccessException as RFC 9457 403', () => {
       const { mockHost, sentPayload } = createMockHost();
       filter.catch(new UnauthorizedAccountAccessException('acc-bob', 'cust-alice'), mockHost);
 
@@ -347,7 +380,7 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
       );
     });
 
-    it('should format AccountNotActiveException as RFC 7807 422', () => {
+    it('should format AccountNotActiveException as RFC 9457 422', () => {
       const { mockHost, sentPayload } = createMockHost();
       filter.catch(new AccountNotActiveException('acc-susp', 'SUSPENDED'), mockHost);
 
@@ -360,7 +393,7 @@ describe('Accounts & Transfers REST Controllers (NestJS 11 + Fastify)', () => {
       );
     });
 
-    it('should format SingleTransferLimitExceededException as RFC 7807 422', () => {
+    it('should format SingleTransferLimitExceededException as RFC 9457 422', () => {
       const { mockHost, sentPayload } = createMockHost();
       filter.catch(new SingleTransferLimitExceededException(500000000n, 200000000n), mockHost);
 

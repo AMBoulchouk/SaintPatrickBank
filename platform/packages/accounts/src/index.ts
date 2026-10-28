@@ -13,6 +13,8 @@ export * from './domain/exceptions/account.exceptions.js';
 export * from './domain/ports/payment-account.repository.interface.js';
 export * from './domain/ports/ledger-reader.port.interface.js';
 export * from './domain/ports/financial-transfer.port.interface.js';
+export * from './domain/ports/cvu-assignment-provider.port.interface.js';
+export * from './domain/ports/customer-compliance.port.interface.js';
 
 // DTOs & Commands
 export * from './application/dto/account.dto.js';
