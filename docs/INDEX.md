@@ -42,7 +42,7 @@ This directory contains the formal architectural blueprints, legacy audit, regul
   * 8-Phase execution roadmap (Phase 0 through Phase 7) with dependencies and acceptance criteria.
 
 * **[05. Ledger Core Formal Architecture, Data Model & Invariants](./architecture/05-ledger-core-formal-design.md)**
-  * Complete entity-relationship model, boundary justification, mandatory mathematical invariants, lifecycle state machines, deterministic row-locking proof against double-spending, and proposed PostgreSQL 18 DDL blueprint.
+  * Complete entity-relationship model, boundary justification, mandatory mathematical invariants, append guard immutability, `SECURITY DEFINER` transactional gateway, Strategy B reservation model, deadlock realism, and PostgreSQL 18 experimental DDL validated via Testcontainers.
 * **[06. Formal Registry of Pending Reviews](./PENDING-REVIEWS.md)**
   * Explicit tracking of accounting invariants verification, concurrency benchmarking, regulatory operating model choice, external financial integrations, and commercial trademark validation.
 
